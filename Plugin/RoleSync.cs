@@ -13,7 +13,7 @@ namespace RoleSync.Plugin
         public override string Name { get; } = "RoleSync";
         public override string Prefix { get; } = "role_sync";
         public override string Author { get; } = "Jesus-QC";
-        public override Version Version { get; } = new Version(1, 0, 0);
+        public override Version Version { get; } = new Version(1, 0, 1);
         public override Version RequiredExiledVersion { get; } = new Version(5, 3, 0);
 
         public override void OnEnabled()
@@ -44,6 +44,7 @@ namespace RoleSync.Plugin
             using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
                 yield return Timing.WaitUntilDone(webRequest.SendWebRequest());
+                Log.Debug("Request done", Config.ShowDebug);
 
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
@@ -69,8 +70,9 @@ namespace RoleSync.Plugin
                         Config.ShowDebug);
                     yield break;
                 }
-                
-                player.Group = Server.PermissionsHandler.GetGroup(groupName);
+
+                var g = Server.PermissionsHandler.GetGroup(groupName);
+                player.SetRank(g.BadgeText, g);
                 Log.Debug($"User {player.Nickname} with id {player.RawUserId} synced successfully.");
             }
         }
